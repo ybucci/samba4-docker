@@ -1,0 +1,59 @@
+# Samba4 AD-DC docker container
+
+This docker container runs Samba4 as an Active Directory Domain Controller.
+
+The first time you start the container, samba-tool will be invoked to set it up using the supplied [environment variables](#environment-variables).
+After set is complete, the container will continue starting to get the DC up and running.
+
+The container saves all necessary files within a volume mounted at '/samba'.
+See the following examples on how to start/setup the DC. It works best with host networking. With host networking, you'll need to ensure you allow the requisite firewall ports through at the host-level, too.
+
+## Exemples 
+
+### Provisionner un domaine
+
+```bash
+docker run -it \
+    -e SAMBA_DC_REALM="samdom.example.com" \
+    -e SAMBA_DC_ADMIN_PASSWD="Password1!" \
+    -e SAMBA_DC_ACTION="provision" \
+    -e SAMBA_DC_DNS_FORWARDER="8.8.8.8 8.8.4.4" \
+    -e SAMBA_DC_DOMAIN="SAMDOM_EXAMPLE" \
+    -v ${PWD}/samba_provision:/samba \
+    --net host --privileged \
+    -h dc1.samdom.example.com -P \
+    --restart=unless-stopped \
+    --name dc1 \
+    adamrushad/samba-ad-dc
+```
+
+### Joindre un domaine
+
+```bash
+docker run -it \
+    -e SAMBA_DC_REALM=samdom.example.com" \
+    -e SAMBA_DC_ADMIN_PASSWD="Password1!" \
+    -e SAMBA_DC_ACTION="join" \
+    -e SAMBA_DC_DNS_FORWARDER="8.8.8.8 8.8.4.4" \
+    -e SAMBA_DC_DOMAIN="SAMDOM_EXAMPLE" \
+    -e SAMBA_DC_MASTER="192.168.1.2" \
+    -v ${PWD}/samba_join:/samba \
+    --net host --privileged \
+    -h dc2.samdom.example.com -P \
+    --restart=unless-stopped \
+    --name dc2 \
+    adamrushad/samba-ad-dc
+```
+
+## Environment variables
+
+The following environment variables are all used as part of the DC setup process.
+If the DC has been setup, none of htese variables have any effect on the container.
+
+- `SAMBA_DC_REALM` (*required*) The realm (FQDN) for the domain. (e.q. `samdom.example.com`).
+- `SAMBA_DC_ACTION` (*required*) The action to take for setup. Must either be `provision` or `join`.
+- `SAMBA_DC_MASTER` (*required for joining*) The master DC to join. Should be an IP address.
+- `SAMBA_DC_ADMIN_PASSWD` (*required for joining*) The Administrator password for the domain. Will randomly generate if not specified, but *must* be correct to join an existing domain.
+- `SAMBA_DC_DNS_FORWARDER` (*optional*) Space separated list of DNS servers to which recursive queries should be forwarded.
+- `SAMBA_OPTIONS` (*optional*) Additional options to samba-tool. See man page for available options.
+- `SAMBA_DC_DOMAIN` (*optional*) Short name for the domain to create/join. Set to leftmost part of `SAMBA_DC_REALM` if unspecified.
