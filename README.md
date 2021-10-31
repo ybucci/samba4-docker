@@ -16,7 +16,6 @@ docker run -d -it  \
     -e SAMBA_DC_REALM="contoso.local"  \
     -e SAMBA_DC_ADMIN_PASSWD="Password1!" \
     -e SAMBA_DC_ACTION="provision" \
-    -e SAMBA_DC_DNS_FORWARDER="8.8.8.8 8.8.4.4" \
     -e SAMBA_DC_DOMAIN="CONTOSO" \
     -e SAMBA_INTERFACE="enp0s3" \
     -v /etc/timezone:/etc/timezone:ro \
@@ -29,7 +28,7 @@ docker run -d -it  \
     -h servidor-pdc.contoso.local -P \
     --restart=unless-stopped \
     --name pdc \
-    yuribucci/samba-dc:1.0.38
+    yuribucci/samba-dc:1.0.53
 ```
 
 ### Domain Join
