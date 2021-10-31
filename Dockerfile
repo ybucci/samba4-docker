@@ -1,6 +1,8 @@
 FROM centos:centos8
 
 
+ARG SAMBA_VERSION=4.14.8
+
 # ARG DEBIAN_FRONTEND=noninteractive
 # RUN DEP_MODULES="acl apt-utils attr autoconf bind9utils binutils bison build-essential ccache chrpath curl debhelper dnsutils docbook-xml docbook-xsl flex gcc gdb git glusterfs-common gzip heimdal-multidev hostname htop krb5-config krb5-kdc krb5-user language-pack-en lcov libacl1-dev libarchive-dev libattr1-dev libavahi-common-dev libblkid-dev libbsd-dev libcap-dev libcephfs-dev libcups2-dev libdbus-1-dev libglib2.0-dev libgnutls28-dev libgpgme11-dev libicu-dev libjansson-dev libjs-jquery libjson-perl libkrb5-dev libldap2-dev liblmdb-dev libncurses5-dev libpam0g-dev libparse-yapp-perl libpcap-dev libpopt-dev libreadline-dev libsystemd-dev libtasn1-bin libtasn1-dev libtracker-sparql-2.0-dev libunwind-dev lmdb-utils locales lsb-release make mawk mingw-w64 patch perl perl-modules pkg-config procps psmisc python3 python3-cryptography python3-dbg python3-dev python3-dnspython python3-gpg python3-iso8601 python3-markdown python3-matplotlib python3-pexpect python3-pyasn1 python3-setproctitle rng-tools rsync sed sudo tar tree uuid-dev wget xfslibs-dev xsltproc zlib1g-dev" && apt-get update && apt-get install -y $DEP_MODULES && apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean
 RUN yum update -y && yum install -y dnf-plugins-core && yum install -y epel-release
@@ -17,6 +19,7 @@ RUN yum install -y \
     attr \
     autoconf \
     avahi-devel \
+    bind \
     bind-utils \
     binutils \
     bison \
@@ -110,29 +113,27 @@ RUN yum install -y \
     which \
     xfsprogs-devel \
     yum-utils \
-    zlib-devel
+    zlib-devel \
+    supervisor
 
 RUN yum clean all    
 
-RUN wget https://download.samba.org/pub/samba/samba-4.15.0.tar.gz
-RUN tar -xvf samba-4.15.0.tar.gz && cd samba-4.15.0 && ./configure --prefix /usr --enable-fhs --sysconfdir=/etc --localstatedir=/var --with-privatedir=/var/lib/samba/private --with-piddir=/var/run/samba --with-automount --datadir=/usr/share --with-lockdir=/var/run/samba --with-statedir=/var/lib/samba --with-cachedir=/var/cache/samba && make -j4 && make install && rm -rf /samba-4.15.0*
-
-RUN ln -s /etc/samba /samba/etc  \
-  && ln -s /var/lib/samba /samba/lib  \
-  && ln -s /var/log/samba /samba/log 
+RUN wget https://download.samba.org/pub/samba/stable/samba-$SAMBA_VERSION.tar.gz
+RUN tar -xvf samba-$SAMBA_VERSION.tar.gz && cd samba-$SAMBA_VERSION && ./configure --prefix /usr --enable-fhs --sysconfdir=/etc --localstatedir=/var --with-privatedir=/var/lib/samba/private --with-piddir=/var/run/samba --with-automount --datadir=/usr/share --with-lockdir=/var/run/samba --with-statedir=/var/lib/samba --with-cachedir=/var/cache/samba && make -j4 && make install && rm -rf /samba-$SAMBA_VERSION*
 
 COPY nsswitch.conf /etc/nsswitch.conf
+COPY named.conf /etc/named.conf
+RUN chown named:named /etc/named.conf
+RUN echo 'OPTIONS="-4"' >> /etc/sysconfig/named
+
 RUN ln -s /usr/lib/libnss_winbind.so.2 /lib64/
 RUN ln -s /lib64/libnss_winbind.so.2 /lib64/libnss_winbind.so
 RUN ldconfig
 
-# ENV PATH=/usr/local/samba/bin:/usr/local/samba/sbin:$PATH
-
-# VOLUME ["/var/lib/samba", "/etc/samba"]
-
-VOLUME [ "/samba" ]
+RUN rm -rf /etc/samba/smb.conf
 
 ADD entrypoint.sh /entrypoint.sh
+COPY supervisord.conf /etc/supervisord.d/supervisord.conf
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
