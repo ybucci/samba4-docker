@@ -47,11 +47,8 @@ if [ ! -f /etc/samba/smb.conf ]; then
         --password="${SAMBA_DC_ADMIN_PASSWD}" \
         --workgroup="${SAMBA_DC_DOMAIN}" \
         --option="interfaces=lo $SAMBA_INTERFACE" \
-        --option="bind interfaces only=yes" \
-        --option="dns forwarder"="${SAMBA_DC_DNS_FORWARDER}"
+        --option="bind interfaces only=yes"
       info "${SAMBA_DC_DOMAIN} - Domain Joining Successful"
-      rm -rf /etc/krb5.conf
-      ln -s /var/lib/samba/private/krb5.conf /etc/krb5.conf
       echo "# ADD YOUR FOLDERS SHARES HERE #
      
       # SET PERMISSIONS OF FOLDER WITH THIS COMMAND:
@@ -70,8 +67,6 @@ if [ ! -f /etc/samba/smb.conf ]; then
         --option="interfaces=lo $SAMBA_INTERFACE" \
         --option="bind interfaces only=yes"
       info "${SAMBA_DC_DOMAIN} - Domain Provisioning Successful"
-      rm -rf /etc/krb5.conf
-      ln -s /var/lib/samba/private/krb5.conf /etc/krb5.conf      
       echo "# ADD YOUR FOLDERS SHARES HERE #
      
       # SET PERMISSIONS OF FOLDER WITH THIS COMMAND:
