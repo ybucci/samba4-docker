@@ -1,5 +1,7 @@
 # Samba4 AD-DC docker container
 
+Automation of deployment with ansible: https://github.com/YuriBucci2/samba4-docker-ansible
+
 This docker container runs Samba4 as an Active Directory Domain Controller.
 
 The first time you start the container, samba-tool will be invoked to set it up using the supplied [environment variables](#environment-variables).
