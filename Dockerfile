@@ -1,7 +1,9 @@
 FROM centos:centos8
 
-ARG SAMBA_VERSION=4.14.8
+ARG SAMBA_VERSION=4.15.6
 
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
 RUN yum update -y && yum install -y dnf-plugins-core && yum install -y epel-release
 RUN yum -v repolist all
 RUN yum config-manager --set-enabled PowerTools -y || \

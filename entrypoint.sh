@@ -52,7 +52,6 @@ if [ ! -f /etc/samba/smb.conf ]; then
       echo "# ADD YOUR FOLDERS SHARES HERE #
      
       # SET PERMISSIONS OF FOLDER WITH THIS COMMAND:
-
       docker exec -it pdc chown root:\"Domain Admins\" /samba/shares/FOLDER
       " > /samba/shares/README.txt
       ;;
@@ -70,7 +69,6 @@ if [ ! -f /etc/samba/smb.conf ]; then
       echo "# ADD YOUR FOLDERS SHARES HERE #
      
       # SET PERMISSIONS OF FOLDER WITH THIS COMMAND:
-
       docker exec -it pdc chown root:\"Domain Admins\" /samba/shares/FOLDER
       " > /samba/shares/README.txt
       ;;
