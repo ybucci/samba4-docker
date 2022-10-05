@@ -140,6 +140,7 @@ docker run -d -it  \
     -e SAMBA_INTERFACE="eth1" \
     -v /etc/timezone:/etc/timezone:ro \
     -v /etc/localtime:/etc/localtime:ro \
+    -v ${PWD}/samba/domain:/var/lib/samba/private \
     -v ${PWD}/samba/config:/etc/samba \
     -v ${PWD}/samba/logs:/var/log/samba \
     -v ${PWD}/samba/shares:/samba/shares \
