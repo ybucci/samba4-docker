@@ -7,8 +7,9 @@ COPY nsswitch.conf /etc/nsswitch.conf
 COPY named.conf /etc/named.conf
 RUN chown named:named /etc/named.conf && echo 'OPTIONS="-4"' >> /etc/sysconfig/named
 RUN ln -s /usr/lib/libnss_winbind.so.2 /lib64/ && ln -s /lib64/libnss_winbind.so.2 /lib64/libnss_winbind.so && ldconfig && ldconfig && rm -rf /etc/samba/smb.conf
-ADD entrypoint.sh /entrypoint.sh
-COPY supervisord.conf /etc/supervisord.d/supervisord.conf
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+ADD entrypoint.sh /entrypoint/entrypoint.sh
+COPY supervisord* /entrypoint/
+COPY krb5.conf /entrypoint/
+RUN chmod +x /entrypoint/entrypoint.sh
+ENTRYPOINT ["/entrypoint/entrypoint.sh"]
 CMD ["samba"]
