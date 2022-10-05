@@ -19,18 +19,18 @@ docker run -d -it  \
     -e SAMBA_DC_ADMIN_PASSWD="Password1!" \
     -e SAMBA_DC_ACTION="provision" \
     -e SAMBA_DC_DOMAIN="CONTOSO" \
-    -e SAMBA_INTERFACE="enp0s3" \
+    -e SAMBA_INTERFACE="eth1" \
     -v /etc/timezone:/etc/timezone:ro \
     -v /etc/localtime:/etc/localtime:ro \
-    -v /var/lib/samba:/var/lib/samba \
-    -v /etc/samba:/etc/samba \
-    -v /var/log/samba:/var/log/samba \
+    -v ${PWD}/samba/domain:/var/lib/samba \
+    -v ${PWD}/samba/config:/etc/samba \
+    -v ${PWD}/samba/logs:/var/log/samba \
     -v ${PWD}/samba/shares:/samba/shares \
     --net host --privileged \
     -h servidor-pdc.contoso.local -P \
     --restart=unless-stopped \
-    --name pdc \
-    yuribucci/samba4-dc:1.0.0_4.14.8
+    --name samba-pdc \
+    yuribucci/samba4-dc:1.0.0_4.17.0
 ```
 
 ### Domain Join
@@ -45,15 +45,15 @@ docker run -d -it  \
     -e SAMBA_INTERFACE="enp0s3" \
     -v /etc/timezone:/etc/timezone:ro \
     -v /etc/localtime:/etc/localtime:ro \
-    -v /var/lib/samba:/var/lib/samba \
-    -v /etc/samba:/etc/samba \
-    -v /var/log/samba:/var/log/samba \
+    -v ${PWD}/samba/domain:/var/lib/samba \
+    -v ${PWD}/samba/config:/etc/samba \
+    -v ${PWD}/samba/logs:/var/log/samba \
     -v ${PWD}/samba/shares:/samba/shares \
     --net host --privileged \
     -h servidor-dc.contoso.local -P \
     --restart=unless-stopped \
-    --name dc \
-    yuribucci/samba4-dc:1.0.0_4.14.8
+    --name samba-dc \
+    yuribucci/samba4-dc:1.0.0_4.17.0
 ```
 
 ## Environment variables
