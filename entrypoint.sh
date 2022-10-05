@@ -1,15 +1,5 @@
 #!/bin/sh
 
-# Required environment variables
-# SAMBA_DC_REALM - Samba Realm
-# SAMBA_DC_ACTION - Action to take (provision or join)
-# SAMBA_DC_MASTER - Only required or used during domain join. IP Address of existing DC to join.
-# SAMBA_DC_ADMIN_PASSWD - Administrator password (only used to provision or join domain). If not specified, will randomly generate. Must be correct to join.
-
-# Optional environment variables
-# SAMBA_DC_DNS_FORWARDER - IP address to forward DNS requests to (accepts space separated list)
-# SAMBA_DC_DOMAIN - Samba AD Domain shortname. Set to leftmost part of SAMBA_DC_REALM if unspecified.
-
 set -e
 
 COMMAND=ash
@@ -105,10 +95,21 @@ if [ ! -f /etc/samba/smb.conf ]; then
   esac
 fi
 
+case "${SAMBA_DC_ACTION}" in
+  "join")
+    cp /entrypoint/supervisord-dc.conf /etc/supervisord.d/supervisord.conf      ;;
+  "provision")
+    cp /entrypoint/supervisord-dc.conf /etc/supervisord.d/supervisord.conf       ;;
+  "member")
+    cp /entrypoint/supervisord-fs.conf /etc/supervisord.d/supervisord.conf
+    cp /entrypoint/krb5.conf /etc/krb5.conf
+    SAMBA_DC_REALM_UPPER=$(echo $SAMBA_DC_REALM | tr 'a-z' 'A-Z')
+    sed -i "s/CHANGE_ME/$SAMBA_DC_REALM_UPPER/g" /etc/krb5.conf
+    ;;
+esac
+
 if [ "$1" = 'samba' ]
 then
-  # named-checkconf "/etc/named.conf"
-  # exec /usr/sbin/named -4 -c /etc/named.conf -u named -f
   exec /usr/bin/supervisord -c /etc/supervisord.d/supervisord.conf
 fi
 
