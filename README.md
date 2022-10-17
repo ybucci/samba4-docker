@@ -14,7 +14,7 @@ See the following examples on how to start/setup the DC and FileServer
 - Pull the image
 
 ```bash
-docker pull yuribucci/samba4-dc:1.0.0_4.17.0
+docker pull ybucci/samba4-ad:1.0.0_4.17.0
 ```
 
 - Edit resolv.conf and point DNS to your local server and search domain
@@ -41,7 +41,6 @@ docker run -d -it  \
     -e SAMBA_DC_DOMAIN="CONTOSO" \
     -e SAMBA_INTERFACE="eth1" \
     -v /etc/timezone:/etc/timezone:ro \
-    -v /etc/localtime:/etc/localtime:ro \
     -v ${PWD}/samba/domain:/var/lib/samba \
     -v ${PWD}/samba/config:/etc/samba \
     -v ${PWD}/samba/logs:/var/log/samba \
@@ -50,7 +49,7 @@ docker run -d -it  \
     -h server-pdc.contoso.local -P \
     --restart=unless-stopped \
     --name samba-pdc \
-    yuribucci/samba4-dc:1.0.0_4.17.0
+    ybucci/samba4-ad:1.0.0_4.17.0
 ```
 
 ### How to Domain DC Domain Join
@@ -58,7 +57,7 @@ docker run -d -it  \
 - Pull the image
 
 ```bash
-docker pull yuribucci/samba4-dc:1.0.0_4.17.0
+docker pull ybucci/samba4-ad:1.0.0_4.17.0
 ```
 
 - Edit resolv.conf and point DNS to your local server and search domain
@@ -86,7 +85,6 @@ docker run -d -it  \
     -e SAMBA_DC_DOMAIN="CONTOSO" \
     -e SAMBA_INTERFACE="eth1" \
     -v /etc/timezone:/etc/timezone:ro \
-    -v /etc/localtime:/etc/localtime:ro \
     -v ${PWD}/samba/domain:/var/lib/samba \
     -v ${PWD}/samba/config:/etc/samba \
     -v ${PWD}/samba/logs:/var/log/samba \
@@ -95,7 +93,7 @@ docker run -d -it  \
     -h server-dc.contoso.local -P \
     --restart=unless-stopped \
     --name samba-dc \
-    yuribucci/samba4-dc:1.0.0_4.17.0
+    ybucci/samba4-ad:1.0.0_4.17.0
 ```
 
 - Wait for succesfull join, after that change the resolv.conf
@@ -110,7 +108,7 @@ nameserver 192.168.18.131 # IP of your DC server
 - Pull the image
 
 ```bash
-docker pull yuribucci/samba4-dc:1.0.0_4.17.0
+docker pull ybucci/samba4-ad:1.0.0_4.17.0
 ```
 
 - Edit resolv.conf and point DNS to your local server and search domain
@@ -139,8 +137,7 @@ docker run -d -it  \
     -e SAMBA_DC_DOMAIN="CONTOSO" \
     -e SAMBA_INTERFACE="eth1" \
     -v /etc/timezone:/etc/timezone:ro \
-    -v /etc/localtime:/etc/localtime:ro \
-    -v ${PWD}/samba/domain:/var/lib/samba/private \
+    -v ${PWD}/samba/domain:/var/lib/samba \
     -v ${PWD}/samba/config:/etc/samba \
     -v ${PWD}/samba/logs:/var/log/samba \
     -v ${PWD}/samba/shares:/samba/shares \
@@ -148,7 +145,7 @@ docker run -d -it  \
     -h server-fs.contoso.local -P \
     --restart=unless-stopped \
     --name samba-fs \
-    yuribucci/samba4-dc:1.0.0_4.17.0
+    ybucci/samba4-ad:1.0.0_4.17.0
 ```
 
 
