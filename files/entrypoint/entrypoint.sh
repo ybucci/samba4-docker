@@ -16,6 +16,16 @@ info () {
   echo "[INFO] $@"
 }
 
+if [ ! -d /var/lib/samba/private ]; then
+  mkdir /var/lib/samba/private
+  chmod 700 /var/lib/samba/private
+fi
+
+if [ ! -d /var/lib/samba/bind-dns ]; then
+  mkdir /var/lib/samba/bind-dns
+  chmod 770 /var/lib/samba/bind-dns
+fi
+
 if [ ! -f /etc/samba/smb.conf ]; then
 
   : "${SAMBA_DC_REALM:?SAMBA_DC_REALM must be set}"

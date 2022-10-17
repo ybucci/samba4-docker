@@ -8,4 +8,4 @@ RUN chown named:named /etc/named.conf && echo 'OPTIONS="-4"' >> /etc/sysconfig/n
 RUN ln -s /usr/lib/libnss_winbind.so.2 /lib64/ && ln -s /lib64/libnss_winbind.so.2 /lib64/libnss_winbind.so && ldconfig && ldconfig && rm -rf /etc/samba/smb.conf
 RUN chmod +x /entrypoint/entrypoint.sh
 ENTRYPOINT ["/entrypoint/entrypoint.sh"]
-CMD ["samba"]
+CMD ["samba"] 
