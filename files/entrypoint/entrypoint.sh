@@ -16,6 +16,16 @@ info () {
   echo "[INFO] $@"
 }
 
+if [ ! -d /var/lib/samba/private ]; then
+  mkdir /var/lib/samba/private
+  chmod 700 /var/lib/samba/private
+fi
+
+if [ ! -d /var/lib/samba/bind-dns ]; then
+  mkdir /var/lib/samba/bind-dns
+  chmod 770 /var/lib/samba/bind-dns
+fi
+
 if [ ! -f /etc/samba/smb.conf ]; then
 
   : "${SAMBA_DC_REALM:?SAMBA_DC_REALM must be set}"
@@ -30,7 +40,6 @@ if [ ! -f /etc/samba/smb.conf ]; then
   case "${SAMBA_DC_ACTION}" in
     "join")
       info "${SAMBA_DC_DOMAIN} - Begin Domain Joining"
-      cp /entrypoint/supervisord-dc.conf /etc/supervisord.d/supervisord.conf
       samba-tool domain join "${SAMBA_DC_REALM}" DC \
         --dns-backend="BIND9_DLZ" \
         --username="Administrator" \
@@ -47,10 +56,12 @@ if [ ! -f /etc/samba/smb.conf ]; then
       rm -rf /etc/krb5.conf
       cp /var/lib/samba/private/krb5.conf /etc/krb5.conf
       chown root:named /etc/krb5.conf
-      chown root:named /var/lib/samba/bind-dns -R      ;;
+      chown root:named /var/lib/samba/bind-dns -R
+      mkdir /var/lib/samba/ntp_signd/
+      chmod 0750 /var/lib/samba/ntp_signd/
+      chown root.chrony /var/lib/samba/ntp_signd/       ;;
     "provision")
       info "${SAMBA_DC_DOMAIN} - Begin Domain Provisioning"
-      cp /entrypoint/supervisord-dc.conf /etc/supervisord.d/supervisord.conf
       samba-tool domain provision --domain="${SAMBA_DC_DOMAIN}" \
         --adminpass="${SAMBA_DC_ADMIN_PASSWD}" \
         --server-role=dc \
@@ -68,10 +79,12 @@ if [ ! -f /etc/samba/smb.conf ]; then
       rm -rf /etc/krb5.conf
       cp /var/lib/samba/private/krb5.conf /etc/krb5.conf
       chown root:named /etc/krb5.conf
-      chown root:named /var/lib/samba/bind-dns -R      ;;
+      chown root:named /var/lib/samba/bind-dns -R
+      mkdir /var/lib/samba/ntp_signd/
+      chmod 0750 /var/lib/samba/ntp_signd/
+      chown root.chrony /var/lib/samba/ntp_signd/       ;;      
     "member")
       info "${SAMBA_DC_DOMAIN} - Begin Member Join"
-      cp /entrypoint/supervisord-fs.conf /etc/supervisord.d/supervisord.conf
       cp /entrypoint/krb5.conf /etc/krb5.conf
       SAMBA_DC_REALM_UPPER=$(echo $SAMBA_DC_REALM | tr 'a-z' 'A-Z')
       sed -i "s/CHANGE_ME/$SAMBA_DC_REALM_UPPER/g" /etc/krb5.conf
@@ -97,10 +110,25 @@ fi
 
 case "${SAMBA_DC_ACTION}" in
   "join")
-    cp /entrypoint/supervisord-dc.conf /etc/supervisord.d/supervisord.conf      ;;
+    rm -rf /etc/krb5.conf
+    cp /var/lib/samba/private/krb5.conf /etc/krb5.conf
+    chown root:named /etc/krb5.conf
+    chown root:named /var/lib/samba/bind-dns -R  
+    cp /entrypoint/chrony.conf /etc/chrony.conf
+    cp /entrypoint/supervisord-dc.conf /etc/supervisord.d/supervisord.conf
+    ;;
   "provision")
-    cp /entrypoint/supervisord-dc.conf /etc/supervisord.d/supervisord.conf       ;;
+    rm -rf /etc/krb5.conf
+    cp /var/lib/samba/private/krb5.conf /etc/krb5.conf
+    chown root:named /etc/krb5.conf
+    chown root:named /var/lib/samba/bind-dns -R  
+    cp /entrypoint/chrony.conf /etc/chrony.conf
+    cp /entrypoint/supervisord-dc.conf /etc/supervisord.d/supervisord.conf 
+    ;;
   "member")
+    cp /entrypoint/chrony-fs.conf /etc/chrony.conf
+    GET_HOSTS=$(cat /etc/hosts | awk '{print $2}' | egrep -iv "localhost|samba|#|^$|$(hostname)")
+    for i in `echo $GET_HOSTS`; do if ! grep -qF "pool $i iburst" /etc/chrony.conf; then echo "pool $i iburst" >> /etc/chrony.conf; fi; done
     cp /entrypoint/supervisord-fs.conf /etc/supervisord.d/supervisord.conf
     cp /entrypoint/krb5.conf /etc/krb5.conf
     SAMBA_DC_REALM_UPPER=$(echo $SAMBA_DC_REALM | tr 'a-z' 'A-Z')
