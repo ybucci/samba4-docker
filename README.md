@@ -14,7 +14,7 @@ See the following examples on how to start/setup the DC and FileServer
 - Pull the image
 
 ```bash
-docker pull ybucci/samba4-ad:1.0.0_4.17.0
+docker pull ybucci/samba4-ad:1.0.1_4.17.0
 ```
 
 - Edit resolv.conf and point DNS to your local server and search domain
@@ -49,7 +49,7 @@ docker run -d -it  \
     -h server-pdc.contoso.local -P \
     --restart=unless-stopped \
     --name samba-pdc \
-    ybucci/samba4-ad:1.0.0_4.17.0
+    ybucci/samba4-ad:1.0.1_4.17.0
 ```
 
 ### How to Domain DC Domain Join
@@ -57,7 +57,7 @@ docker run -d -it  \
 - Pull the image
 
 ```bash
-docker pull ybucci/samba4-ad:1.0.0_4.17.0
+docker pull ybucci/samba4-ad:1.0.1_4.17.0
 ```
 
 - Edit resolv.conf and point DNS to your local server and search domain
@@ -93,7 +93,7 @@ docker run -d -it  \
     -h server-dc.contoso.local -P \
     --restart=unless-stopped \
     --name samba-dc \
-    ybucci/samba4-ad:1.0.0_4.17.0
+    ybucci/samba4-ad:1.0.1_4.17.0
 ```
 
 - Wait for succesfull join, after that change the resolv.conf
@@ -108,7 +108,7 @@ nameserver 192.168.18.131 # IP of your DC server
 - Pull the image
 
 ```bash
-docker pull ybucci/samba4-ad:1.0.0_4.17.0
+docker pull ybucci/samba4-ad:1.0.1_4.17.0
 ```
 
 - Edit resolv.conf and point DNS to your local server and search domain
@@ -145,7 +145,7 @@ docker run -d -it  \
     -h server-fs.contoso.local -P \
     --restart=unless-stopped \
     --name samba-fs \
-    ybucci/samba4-ad:1.0.0_4.17.0
+    ybucci/samba4-ad:1.0.1_4.17.0
 ```
 
 
